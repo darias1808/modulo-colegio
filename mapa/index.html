@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Descubre tu Colegio</title>
+    <link rel="stylesheet" href="css/mapa.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="cabecera">
+        <div class="cab-izq">
+          <h1 class="tira titulo">Descubre tu Colegio</h1>
+          <p id="instruccion" class="instruccion"></p>
+        </div>
+        <div class="cab-der">
+          <div class="contador" role="status">
+            <span class="contador-num"><b id="cuenta">0</b> de <span id="total">0</span></span>
+            <span class="contador-txt">descubiertos</span>
+            <span class="contador-barra" aria-hidden="true"><i id="barra"></i></span>
+          </div>
+          <button id="btn-lista" class="btn" type="button" aria-haspopup="dialog" aria-controls="lista">Ver como lista</button>
+        </div>
+      </header>
+
+      <main class="escenario">
+        <svg id="mapa" class="mapa" role="group" aria-label="Mapa de Costa Rica con las sedes y los beneficios del Colegio"></svg>
+      </main>
+    </div>
+
+    <dialog id="tarjeta" class="tarjeta" aria-labelledby="t-titulo">
+      <div class="t-cab">
+        <span id="t-etiqueta" class="etiqueta"></span>
+        <button id="t-cerrar" class="btn-ico" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z" /></svg>
+        </button>
+      </div>
+      <div class="t-cuerpo">
+        <svg id="t-icono" class="t-icono" viewBox="0 0 200 200" aria-hidden="true" hidden></svg>
+        <h2 id="t-titulo"></h2>
+        <p id="t-subtitulo" class="t-subtitulo"></p>
+        <div id="t-texto" class="t-texto"></div>
+      </div>
+      <div class="t-audio">
+        <button id="t-play" class="btn-play" type="button" aria-label="Pausar la lectura">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path id="t-play-ico" d="M6 5h4v14H6zm8 0h4v14h-4z" /></svg>
+        </button>
+        <button id="t-repetir" class="btn-ico claro" type="button" aria-label="Escuchar desde el inicio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" /></svg>
+        </button>
+        <span class="t-avance" aria-hidden="true"><i id="t-avance"></i></span>
+      </div>
+      <audio id="voz" preload="auto"></audio>
+    </dialog>
+
+    <dialog id="lista" class="tarjeta" aria-labelledby="l-titulo">
+      <div class="t-cab">
+        <h2 id="l-titulo" class="l-titulo">Sedes y beneficios</h2>
+        <button id="l-cerrar" class="btn-ico" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z" /></svg>
+        </button>
+      </div>
+      <div class="t-cuerpo">
+        <h3 class="l-sub">Lugares</h3>
+        <ul id="l-lugares" class="l-items"></ul>
+        <h3 class="l-sub">Beneficios en todo el país</h3>
+        <ul id="l-beneficios" class="l-items"></ul>
+      </div>
+    </dialog>
+
+    <div id="vivo" class="solo-lector" aria-live="polite"></div>
+
+    <script src="js/scorm12.js"></script>
+    <script src="js/contenido.js"></script>
+    <script src="js/geometria.js"></script>
+    <script src="js/iconos.js"></script>
+    <script src="js/tiempos.js"></script>
+    <script src="js/mapa.js"></script>
+  </body>
+</html>
