@@ -542,3 +542,8 @@ input, textarea { background: var(--blanco); color: var(--texto); }
   .barra { gap: 6px; }
   .barra-der { gap: 4px; }
 }
+.nano-tabs { scrollbar-width: none; }
+.nano-tabs::-webkit-scrollbar { display: none; }
+@media (max-width: 360px) {
+  .barra-centro .marca { display: none; }
+}
