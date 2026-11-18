@@ -364,7 +364,7 @@
 
   /* ---------- Lectura ---------- */
   var voz = null;
-  function pararVoz() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} voz = null; }
+  function pararVoz() { if (voz) { voz.pause(); voz.removeAttribute("src"); } voz = null; }
   function pintarLectura(esc, it) {
     var t = el("article", { clase: "tarjeta" });
     t.appendChild(el("span", { clase: "etiqueta", texto: "Lectura" }));
@@ -375,17 +375,16 @@
     var listo = el("button", { clase: "btn principal", type: "button", texto: "Listo, seguir" });
     listo.addEventListener("click", function () { marcar(it.id); siguiente(); });
     acc.appendChild(listo);
-    if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
-      var esc2 = el("button", { clase: "btn", type: "button", html: svg(ICO.voz) + "<span>Escuchar</span>" });
+    // Audio grabado con la misma voz de los videos (herramientas/narrar_lecturas.mjs)
+    if (it.audio) {
+      var esc2 = el("button", { clase: "btn", type: "button", "aria-pressed": "false", html: svg(ICO.voz) + "<span>Escuchar</span>" });
+      var reiniciar = function () { esc2.lastChild.textContent = "Escuchar"; esc2.setAttribute("aria-pressed", "false"); };
       esc2.addEventListener("click", function () {
-        if (voz) { pararVoz(); esc2.lastChild.textContent = "Escuchar"; return; }
-        voz = new SpeechSynthesisUtterance(it.titulo + ". " + parrafosDe(it.texto).join(" "));
-        voz.lang = "es-CR";
-        var es = speechSynthesis.getVoices().filter(function (x) { return /^es/i.test(x.lang); });
-        if (es.length) voz.voice = es.filter(function (x) { return /CR|MX|419|US/.test(x.lang); })[0] || es[0];
-        voz.onend = function () { voz = null; esc2.lastChild.textContent = "Escuchar"; };
-        speechSynthesis.speak(voz);
-        esc2.lastChild.textContent = "Detener";
+        if (voz && !voz.paused) { voz.pause(); esc2.lastChild.textContent = "Seguir escuchando"; esc2.setAttribute("aria-pressed", "false"); return; }
+        if (!voz) { voz = new Audio(it.audio); voz.addEventListener("ended", function () { voz = null; reiniciar(); }); }
+        voz.play().catch(function () {});
+        esc2.lastChild.textContent = "Pausar";
+        esc2.setAttribute("aria-pressed", "true");
       });
       acc.appendChild(esc2);
     }

@@ -48,7 +48,13 @@ function ejercicio(id) {
   delete p.verEnVideo;
   return p;
 }
-const lectura = (id) => { const p = paso(id); return { tipo: "lectura", id, titulo: p.titulo, texto: p.texto, fuente: p.fuente }; };
+const lectura = (id) => {
+  const p = paso(id);
+  const l = { tipo: "lectura", id, titulo: p.titulo, texto: p.texto, fuente: p.fuente };
+  // audio generado con herramientas/narrar_lecturas.mjs
+  if (fs.existsSync(path.join(RAIZ, "media/audio", id + ".mp3"))) l.audio = "media/audio/" + id + ".mp3";
+  return l;
+};
 const gema = (id) => { const p = paso(id); return { tipo: "gema", id, etiqueta: p.etiqueta, titulo: p.titulo, texto: p.texto, url: p.url, boton: p.boton }; };
 const momento = (id) => { const p = paso(id); return p.verEnVideo ? { video: p.verEnVideo.paso, t: p.verEnVideo.t } : null; };
 const objetivo = (sid) => C.secciones.find((s) => s.id === sid).pasos.find((p) => p.tipo === "portada").texto;
