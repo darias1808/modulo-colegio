@@ -230,7 +230,7 @@
     var rango = el("input", { type: "range", min: "0", max: "1000", value: "0", step: "1", "aria-label": "Posición del video" });
     lin.appendChild(fondo); lin.appendChild(av); lin.appendChild(rango);
     var bVel = el("button", { clase: "ctl texto terciario", type: "button", texto: "1×", "aria-label": "Velocidad: normal" });
-    var bCC = it.subtitulos ? el("button", { clase: "ctl texto", type: "button", texto: "CC", "aria-pressed": "true", "aria-label": "Subtítulos" }) : null;
+    var bCC = it.subtitulos ? el("button", { clase: "ctl texto", type: "button", texto: "CC", "aria-pressed": "false", "aria-label": "Subtítulos" }) : null;
     var bTxt = el("button", { clase: "ctl texto terciario", type: "button", texto: "Texto", "aria-label": "Abrir la transcripción" });
     var bVol = el("button", { clase: "ctl secundario", type: "button", "aria-label": "Silenciar", html: svg(ICO.vol) });
     var bFull = el("button", { clase: "ctl", type: "button", "aria-label": "Pantalla completa", html: svg(ICO.pantalla) });
@@ -283,10 +283,14 @@
     });
     if (bCC) {
       var pista = function () { return vid.textTracks && vid.textTracks[0]; };
-      vid.addEventListener("loadedmetadata", function () { if (pista()) pista().mode = "showing"; });
+      // Encendidos si la persona los activó antes, o si el video no trae texto en pantalla
+      var ccOn = estado.cc === true || (estado.cc !== false && !!it.ccVisible);
+      var aplicarCC = function () { bCC.setAttribute("aria-pressed", String(ccOn)); if (pista()) pista().mode = ccOn ? "showing" : "hidden"; };
+      aplicarCC();
+      vid.addEventListener("loadedmetadata", aplicarCC);
       bCC.addEventListener("click", function () {
-        var on = bCC.getAttribute("aria-pressed") !== "true";
-        bCC.setAttribute("aria-pressed", String(on)); if (pista()) pista().mode = on ? "showing" : "hidden";
+        ccOn = !ccOn; estado.cc = ccOn; guardar(); aplicarCC();
+        avisar(ccOn ? "Subtítulos activados" : "Subtítulos desactivados");
       });
     }
     bTxt.addEventListener("click", function () { nano("texto", true); });
@@ -368,7 +372,7 @@
   function pintarLectura(esc, it) {
     var t = el("article", { clase: "tarjeta" });
     t.appendChild(el("span", { clase: "etiqueta", texto: "Lectura" }));
-    t.appendChild(el("h2", { texto: it.titulo }));
+    t.appendChild(el("h1", { texto: it.titulo }));
     parrafosDe(it.texto).forEach(function (p) { t.appendChild(el("p", { texto: p })); });
     if (it.fuente) t.appendChild(el("p", { clase: "fuente", texto: "Fuente: " + it.fuente }));
     var acc = el("div", { clase: "acciones" });
@@ -397,7 +401,7 @@
     var c = CASOS[it.caso];
     var t = el("article", { clase: "tarjeta" });
     t.appendChild(el("span", { clase: "etiqueta", texto: "Práctica con Nano" }));
-    t.appendChild(el("h2", { texto: c.titulo }));
+    t.appendChild(el("h1", { texto: c.titulo }));
     t.appendChild(el("p", { texto: "Nano te va a plantear una situación del trabajo. Elige qué harías. Si tu respuesta se queda corta, Nano te hace una pregunta para que lo pienses otra vez: aquí no hay nota, se aprende probando." }));
     t.appendChild(el("p", { texto: "A la derecha, en «Práctica», ves lo que Nano espera de tu decisión y el momento del video donde se explica cada punto." }));
     var acc = el("div", { clase: "acciones" });
@@ -414,7 +418,7 @@
   function pintarGema(esc, it) {
     var t = el("article", { clase: "tarjeta" });
     t.appendChild(el("span", { clase: "etiqueta", texto: it.etiqueta || "Actividad" }));
-    t.appendChild(el("h2", { texto: it.titulo }));
+    t.appendChild(el("h1", { texto: it.titulo }));
     parrafosDe(it.texto).forEach(function (p) { t.appendChild(el("p", { texto: p })); });
     t.appendChild(el("p", { clase: "fuente", texto: "Se abre en Gemini, en una pestaña nueva. Necesitas iniciar sesión con una cuenta de Google. Al terminar, guarda la constancia que te da." }));
     var acc = el("div", { clase: "acciones" });
@@ -456,7 +460,7 @@
   function pintarNano() {
     var p = $("#nano-panel");
     p.innerHTML = "";
-    p.setAttribute("aria-label", { practicar: "Practicar", consultar: "Consultar", apuntes: "Apuntes", texto: "Transcripción" }[pestana]);
+    p.removeAttribute("aria-label"); p.setAttribute("aria-labelledby", "tab-" + pestana);
     if (pestana === "practicar") pintarChat(p);
     else if (pestana === "consultar") pintarConsulta(p);
     else if (pestana === "apuntes") pintarApuntes(p);
@@ -482,7 +486,7 @@
     var c = CASOS[idc];
     var e = estado.casos[idc] || (estado.casos[idc] = { nodo: "inicio", marcas: [], hist: [] });
     if (!e.hist.length) { e.hist.push({ de: "nano", t: c.nodos.inicio.nano }); guardar(); }
-    var chat = el("div", { clase: "chat", role: "log", "aria-live": "polite" });
+    var chat = el("div", { clase: "chat" });
     chat.appendChild(el("div", { clase: "res-donde", texto: "Caso · " + c.titulo }));
     e.hist.forEach(function (h) { chat.appendChild(el("div", { clase: "burbuja " + (h.de === "yo" ? "yo" : h.de === "logro" ? "logro" : "nano-dice"), texto: h.t })); });
     var nodo = c.nodos[e.nodo];
@@ -505,6 +509,7 @@
   }
   function responder(idc, o) {
     var c = CASOS[idc], e = estado.casos[idc];
+    var desde = e.hist.length + 1;
     e.hist.push({ de: "yo", t: o.texto });
     var nuevas = (o.marca || []).filter(function (m) { return e.marcas.indexOf(m) < 0; });
     nuevas.forEach(function (m) { e.marcas.push(m); });
@@ -521,6 +526,7 @@
     }
     guardar();
     pintarNano();
+    avisar("Nano: " + e.hist.slice(desde).map(function (h) { return h.t; }).join(" "));
     if (!$("#practica").hidden) pintarPractica();
     var f = $("#nano-panel .opciones-chat button") || $("#nano-panel .btn-chico"); if (f) f.focus();
   }
@@ -681,6 +687,24 @@
     if (on) { panel("ruta", false); panel("practica", false); $("#nano-panel").hidden = true; nano(null, false); }
     avisar(on ? "Modo solo el video. Pulsa Escape para salir." : "Saliste del modo solo el video.");
   }
+
+  /* ---------- Modo oscuro ---------- */
+  var sistemaOscuro = window.matchMedia("(prefers-color-scheme: dark)");
+  function temaActual() { return document.documentElement.getAttribute("data-theme") || (sistemaOscuro.matches ? "dark" : "light"); }
+  function pintarTema() {
+    var oscuro = temaActual() === "dark";
+    $("#btn-tema").setAttribute("aria-pressed", String(oscuro));
+    $('meta[name="theme-color"]').setAttribute("content", oscuro ? "#15141b" : "#1b376c");
+  }
+  $("#btn-tema").addEventListener("click", function () {
+    var nuevo = temaActual() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", nuevo);
+    try { localStorage.setItem("plataforma-etica-tema", nuevo); } catch (e) {}
+    pintarTema();
+    avisar(nuevo === "dark" ? "Modo oscuro activado" : "Modo claro activado");
+  });
+  if (sistemaOscuro.addEventListener) sistemaOscuro.addEventListener("change", pintarTema);
+  pintarTema();
 
   /* ---------- Eventos generales ---------- */
   $("#btn-ruta").addEventListener("click", function () { panel("ruta"); });

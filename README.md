@@ -36,3 +36,10 @@ Hay que abrirla desde un servidor (no con doble clic), por ejemplo:
 ```
 npx serve .
 ```
+
+## Accesibilidad y modo oscuro
+
+- Todos los videos tienen subtítulos (botón CC). Se crean con `node herramientas/subtitulos.mjs` y después `generar_datos.mjs`.
+- Las lecturas tienen audio con la voz de los videos (`node herramientas/narrar_lecturas.mjs es-CR-MariaNeural`).
+- Se puede usar con teclado; los botones tienen nombres para lectores de pantalla y se respeta «reducir movimiento».
+- El modo oscuro sigue la configuración del equipo; el botón «Modo oscuro» de la barra permite elegirlo a mano.

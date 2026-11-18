@@ -36,6 +36,11 @@ function video(id, ejercicio, extra) {
     v.portadas = { h: p.portada, v: p.portada };
     v.subtitulos = p.subtitulos;
   }
+  // Los videos del sitio con subtítulos (tolerancia, testimonio) no traen texto en pantalla: se muestran desde el inicio.
+  if (v.subtitulos) v.ccVisible = true;
+  // Los demás usan los subtítulos creados con herramientas/subtitulos.mjs, apagados al inicio
+  // porque el video ya muestra el texto animado.
+  else if (fs.existsSync(path.join(RAIZ, "media/subtitulos", id + ".vtt"))) v.subtitulos = "media/subtitulos/" + id + ".vtt";
   v.palabras = palabras(id);
   if (!v.palabras) v.parrafos = T[id] || [];
   if (ejercicio) v.ejercicio = ejercicio;
