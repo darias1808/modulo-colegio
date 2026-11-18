@@ -43,3 +43,5 @@ npx serve .
 - Las lecturas tienen audio con la voz de los videos (`node herramientas/narrar_lecturas.mjs es-CR-MariaNeural`).
 - Se puede usar con teclado; los botones tienen nombres para lectores de pantalla y se respeta «reducir movimiento».
 - El modo oscuro sigue la configuración del equipo; el botón «Modo oscuro» de la barra permite elegirlo a mano.
+
+Al cambiar CSS o JS, sube el número `?v=` de sus enlaces en `index.html` para que los navegadores no usen la copia vieja.
