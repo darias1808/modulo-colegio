@@ -395,8 +395,8 @@
       var fila = el("div", { clase: "comp-fila" });
       var frase = el("p", { clase: "comp-frase" });
       frase.appendChild(document.createTextNode(f.antes + " "));
-      var hueco = el("span", { clase: "hueco", "aria-label": "espacio en blanco" });
-      hueco.textContent = " ";
+      var hueco = el("span", { clase: "hueco" });
+      hueco.appendChild(el("span", { clase: "solo-lector", texto: "(espacio en blanco)" }));
       frase.appendChild(hueco);
       frase.appendChild(document.createTextNode(f.despues || ""));
       var ops = el("div", { clase: "comp-ops" });
@@ -429,8 +429,8 @@
   /* ---------- Armar la oración con fichas de palabras ---------- */
   TIPOS.oracion = function (def, api) {
     var palabras = def.respuesta.split(/\s+/);
-    var linea = el("div", { clase: "oracion-linea", "aria-label": "Tu frase" });
-    var banco = el("div", { clase: "oracion-banco", "aria-label": "Palabras disponibles" });
+    var linea = el("div", { clase: "oracion-linea", role: "group", "aria-label": "Tu frase" });
+    var banco = el("div", { clase: "oracion-banco", role: "group", "aria-label": "Palabras disponibles" });
     api.cuerpo.appendChild(linea); api.cuerpo.appendChild(banco);
     var fichas = desordenar(palabras.map(function (p, k) { return { p: p, k: k }; }), function (b) {
       return b.map(function (x) { return x.p; }).join(" ") === def.respuesta;
